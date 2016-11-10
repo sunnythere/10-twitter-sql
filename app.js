@@ -23,7 +23,6 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true })); // for HTML form submits
 app.use(bodyParser.json()); // would be for AJAX requests
 
-
 // start the server
 var server = app.listen(1337, function(){
   console.log('listening on port 1337');
