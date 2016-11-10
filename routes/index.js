@@ -52,22 +52,30 @@ module.exports = function makeRouterWithSockets (io) {
   // create a new tweet
   router.post('/tweets', function(req, res, next){
     var nameExists = 0;
+    var userId;
     client.query('SELECT * FROM tweets INNER JOIN users ON tweets.userid = users.id WHERE name = \'' + req.body.name + '\';', function(err, result) {
       if (err) return next(err);
       if (result.rowCount > 0) {
         nameExists = 1;
-      };
+
+        userId = result.rows[0].userid;
+      }
     });
     if (!nameExists) {
-      //insert into name 
-    } 
-    //insert into tweets 
-    client.query('INSERT INTO ')
+      //insert into name
+      client.query('INSERT INTO users (id, name, pictureurl) VALUES (DEFAULT, \'' + req.body.name + '\', DEFAULT) RETURNING id;', function(err, result) {if (err) return next(err);
+              console.log(result);
+        userId = result.rows[0].id;})
+
+    }
+    //insert into tweets
+
+    client.query('INSERT INTO tweets (id, userid, content) VALUES ($1, $2, $3) RETURNING id;', ['DEFAULT', userId, '\'' + req.body.content + '\''], function(err, result) {if (err) return next(err);
     // var newTweet = tweetBank.add(req.body.name, req.body.content);
-    io.sockets.emit('new_tweet', newTweet);
+    //io.sockets.emit('new_tweet', newTweet);
     res.redirect('/');
   });
-
+})
 
   // // replaced this hard-coded route with general static routing in app.js
   // router.get('/stylesheets/style.css', function(req, res, next){
